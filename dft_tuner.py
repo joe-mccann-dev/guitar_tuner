@@ -1,3 +1,4 @@
+from time import sleep
 import sounddevice as sd
 import numpy as np
 import scipy.fftpack as fftpack
@@ -39,14 +40,32 @@ def callback(input_data, frames, time, status):
         print(f'Closest note: {closest_note} {max_freq:.1f} / {closest_pitch:.1f}')
     else:
         print('no input')
-        
 
+# my microphone = 1
+# my audio interface = 2
+def get_selected_device():
+    devices = sd.query_devices()
+    request = 'Enter index of input device\n'
+    print('Printing list of available input devices:')
+    sleep(1)
+    for device in devices:
+        print(f"{device['name']} | Index: {device['index']} | hostapi: {device['hostapi']}")
+        sleep(0.3)
+    print('')
+    selected_device = int(input(request))
+    while selected_device not in range(0, len(devices)):
+        selected_device = int(input(request))
+        
+    return int(selected_device)
+
+sd.default.device = get_selected_device()
 try:
-    with sd.InputStream(channels=1, 
+    with sd.InputStream(channels=1,
                         callback=callback,
                         blocksize=WINDOW_STEP,
                         samplerate=SAMPLE_FREQ):
-                        while True:
-                            pass
+        while True:
+            pass
 except Exception as e:
     print(str(e))
+    
