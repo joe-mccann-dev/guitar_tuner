@@ -14,9 +14,9 @@ window_samples = [0 for _ in range(WINDOW_SIZE)]
 CONCERT_PITCH = 440
 ALL_NOTES = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
 def find_closest_note(pitch):
-    i = int(np.round(np.log2(pitch / CONCERT_PITCH) *12))
+    i = int(np.round(np.log2(pitch / CONCERT_PITCH) * 12))
     closest_note = ALL_NOTES[i % 12] + str(4 + (i + 9) // 12)
-    closest_pitch = CONCERT_PITCH * 2 ** (i / 12)
+    closest_pitch = CONCERT_PITCH * (2 ** (i / 12))
     return closest_note, closest_pitch
 
 def callback(input_data, frames, time, status):
@@ -32,8 +32,8 @@ def callback(input_data, frames, time, status):
         for i in range(int(62 / SAMPLE_FREQ / WINDOW_SIZE)):
             magnitude_spectrum[i] = 0
             
-        max_ind = np.argmax(magnitude_spectrum)
-        max_freq = max_ind * (SAMPLE_FREQ / WINDOW_SIZE)
+        max_index = np.argmax(magnitude_spectrum)
+        max_freq = max_index * (SAMPLE_FREQ / WINDOW_SIZE)
         closest_note, closest_pitch = find_closest_note(max_freq)
         
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -46,15 +46,22 @@ def callback(input_data, frames, time, status):
 def get_selected_device():
     devices = sd.query_devices()
     request = 'Enter index of input device\n'
-    print('Printing list of available input devices:')
-    sleep(1)
+    print('\nPrinting list of available input devices:\n')
+    sleep(0.3)
     for device in devices:
         print(f"{device['name']} | Index: {device['index']} | hostapi: {device['hostapi']}")
-        sleep(0.3)
+        sleep(0.1)
     print('')
-    selected_device = int(input(request))
-    while selected_device not in range(0, len(devices)):
-        selected_device = int(input(request))
+    while True:
+        try:
+            selected_device = int(input(request))
+            if selected_device  in range(0, len(devices)):
+                return selected_device
+            else:
+                print(f'Please enter a number between 0 and {len(devices) - 1}.')
+        except ValueError:
+            print('Invalid input. Please enter a valid number.')
+        
         
     return int(selected_device)
 
