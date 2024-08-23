@@ -61,9 +61,6 @@ def get_selected_device():
                 print(f'Please enter a number between 0 and {len(devices) - 1}.')
         except ValueError:
             print('Invalid input. Please enter a valid number.')
-        
-        
-    return int(selected_device)
 
 sd.default.device = get_selected_device()
 try:
